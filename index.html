@@ -5,288 +5,330 @@
   <title>Test Interactivo de Bioquímica Médica</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f5f5f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     .top-panel {
       display: flex;
-      gap: 5px;
-      margin-bottom: 20px;
       flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
     }
     .question-indicator {
-      width: 25px;
-      height: 25px;
+      width: 35px;
+      height: 35px;
       border-radius: 50%;
       background: #ccc;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
     }
     .question-indicator.correct {
-      background: green;
-      color: white;
+      background: #4CAF50;
+      color: #fff;
     }
     .question-indicator.wrong {
-      background: red;
-      color: white;
+      background: #F44336;
+      color: #fff;
     }
-    .container {
-      background: white;
-      padding: 20px;
-      border-radius: 5px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
     }
     .options {
       list-style: none;
       padding: 0;
     }
     .options li {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      font-size: 20px;
     }
     .nav-buttons {
-      margin-top: 20px;
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
     }
     .nav-buttons button {
-      margin-right: 10px;
-      padding: 5px 10px;
-      font-size: 14px;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #2196F3;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    .nav-buttons button:hover {
+      background-color: #1976D2;
     }
     .feedback {
-      margin-top: 10px;
+      margin-top: 20px;
+      font-size: 22px;
       font-weight: bold;
     }
     .grade {
-      margin-top: 20px;
-      font-size: 18px;
+      margin-top: 30px;
+      font-size: 24px;
       font-weight: bold;
+      text-align: center;
+    }
+    .submit-btn {
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    .submit-btn:hover {
+      background-color: #388E3C;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="top-panel" id="topPanel"></div>
+    <div id="questionContainer"></div>
+    <div class="nav-buttons">
+      <button id="prevBtn" onclick="prevQuestion()">Anterior</button>
+      <button id="submitBtn" class="submit-btn" onclick="submitAnswer()">Enviar</button>
+      <button id="nextBtn" onclick="nextQuestion()">Siguiente</button>
+    </div>
+    <div id="result" class="grade"></div>
+  </div>
 
-<div class="top-panel" id="topPanel"></div>
+  <script>
+    // Array de preguntas
+    const questions = [
+      {
+        question: "Cada 100 ml de solución de cloruro de sodio contiene 0.90 g. ¿Cuántos mEq/L de Na⁺ y Cl⁻ contiene esta solución?",
+        options: ["a) 15.4 mEq/L", "b) 30.8 mEq/L", "c) 77 mEq/L", "d) 154 mEq/L"],
+        answer: 3
+      },
+      {
+        question: "El suero glucosado (Dextrosa al 20%) es una solución de glucosa monohidratada. La osmolaridad es de:",
+        options: ["a) 252 mosm/L", "b) 554 mosm/L", "c) 55 mosm/L", "d) 1108 mosm/L"],
+        answer: 3
+      },
+      {
+        question: "La hipercalemia es la urgencia electrolítica más frecuente. Una de sus causas es:",
+        options: ["a) Insuficiencia renal", "b) Alcalosis", "c) Diarrea", "d) Pérdidas gastrointestinales"],
+        answer: 0
+      },
+      {
+        question: "Esta solución es la primera elección para el estado de shock, debido a su efecto buffer (ciclo de Cori):",
+        options: ["a) Lactato de Ringer", "b) Bicarbonato de sodio", "c) Ringer", "d) Dextrosa al 5%"],
+        answer: 0
+      },
+      {
+        question: "¿Cuál solución electrolítica se aplica a un paciente con 10 episodios de diarrea en 24 horas?",
+        options: ["a) Solución salina isotónica (S.S.I.)", "b) Solución de Hartmann", "c) Dextrosa 5%", "d) Bicarbonato 5%"],
+        answer: 1
+      },
+      {
+        question: "Para redistribuir rápidamente líquidos al compartimento vascular, se requiere:",
+        options: ["a) Dextrosa al 5%", "b) Solución salina isotónica (S.S.I.) al 0.9%", "c) Solución salina hipertónica (S.S.I.) al 3.5%", "d) Ringer"],
+        answer: 2
+      },
+      {
+        question: "(Repetida) Para redistribuir líquidos rápidamente, se requiere:",
+        options: ["a) Dextrosa al 5%", "b) Solución salina isotónica (S.S.I.) al 0.9%", "c) Solución salina hipertónica (S.S.I.) al 3.5%", "d) Ringer"],
+        answer: 2
+      },
+      {
+        question: "Paciente de urgencias: Na 140, Cl 98, K 7.6, Ca 9.2, Mg 1.2. ¿Qué indica el ionograma?",
+        options: ["a) Hipercalcemia e hiperpotasemia", "b) Hipercloremia e hipomagnesemia", "c) Normonatremia e hiperpotasemia", "d) Hipocloremia e hipopotasemia"],
+        answer: 2
+      },
+      {
+        question: "¿Qué indica que una solución de 250 ml está al 2.5%?",
+        options: ["a) 2.5 g en la solución.", "b) 3.75 g en cada 100 cc.", "c) Se aplicaron 6.25 g a 250 ml.", "d) 6.25 g en 250 ml."],
+        answer: 3
+      },
+      {
+        question: "La solución de bicarbonato de sodio al 7.5% en 500 cc aporta:",
+        options: ["a) 8.9 mEq", "b) 445 mEq", "c) 890 mEq", "d) 101 mEq"],
+        answer: 1
+      },
+      {
+        question: "La solución de bicarbonato de sodio al 7.5% se utiliza en:",
+        options: ["a) Acidosis respiratoria", "b) Alcalosis metabólica", "c) Paro cardíaco", "d) Hipocalcemia"],
+        answer: 2
+      },
+      {
+        question: "(Repetida) La hipercalemia es causada por:",
+        options: ["a) Insuficiencia renal", "b) Alcalosis", "c) Diarrea", "d) Pérdidas gastrointestinales"],
+        answer: 0
+      },
+      {
+        question: "Electrolito esencial para la función cardíaca y que disminuye el riesgo de hipokalemia:",
+        options: ["a) Fosfato de potasio", "b) Hartman", "c) Dextrosa 5%", "d) Suero oral"],
+        answer: 0
+      },
+      {
+        question: "(Repetida) Para redistribuir líquidos al compartimento vascular se requiere:",
+        options: ["a) Dextrosa al 5%", "b) Solución salina isotónica (S.S.I.) al 0.9%", "c) Solución salina hipertónica (S.S.I.) al 3.5%", "d) Ringer"],
+        answer: 2
+      },
+      {
+        question: "Principal catión intracelular:",
+        options: ["a) Potasio (K)", "b) Magnesio (Mg)", "c) Sodio (Na)", "d) Fosfato inorgánico (HPO₄²⁻)"],
+        answer: 0
+      },
+      {
+        question: "El agua producida por la oxidación de alimentos se denomina:",
+        options: ["a) Agua desionizada", "b) Agua regia", "c) Agua metabólica", "d) Agua destilada"],
+        answer: 2
+      },
+      {
+        question: "La solución isotónica de Ringer contiene:",
+        options: ["a) Cloruro de sodio", "b) Bicarbonato", "c) D-Glucosa", "d) Cloruros de sodio, potasio y calcio"],
+        answer: 3
+      },
+      {
+        question: "Una solución es hipertónica cuando el contenido total de electrolitos es:",
+        options: ["a) Inferior a 250 mEq/L", "b) Superior a 375 mEq/L", "c) Aproximadamente 310 mEq/L", "d) Ninguno de los anteriores"],
+        answer: 1
+      },
+      {
+        question: "El agua, por sus propiedades físico-químicas, permite almacenar más calor sin elevar su temperatura. ¿A qué se debe?",
+        options: ["a) Calor de evaporación", "b) Calor específico", "c) Calor de fusión", "d) Densidad"],
+        answer: 1
+      }
+    ];
 
-<div class="container" id="questionContainer"></div>
+    let currentQuestion = 0;
+    const userAnswers = new Array(questions.length).fill(null);
+    const submitted = new Array(questions.length).fill(false);
 
-<div class="nav-buttons">
-  <button id="prevBtn" onclick="prevQuestion()">Anterior</button>
-  <button id="nextBtn" onclick="nextQuestion()">Siguiente</button>
-</div>
-
-<div id="result" class="grade"></div>
-
-<script>
-  // Array de preguntas, cada objeto tiene: pregunta, opciones y el índice de la respuesta correcta.
-  const questions = [
-    {
-      question: "1. Cada 100 ml de solución de cloruro de sodio contiene 0.90 g. ¿Cuántos mEq/L de Na⁺ y Cl⁻ contiene esta solución?",
-      options: ["a) 15.4 mEq/L", "b) 30.8 mEq/L", "c) 77 mEq/L", "d) 154 mEq/L"],
-      answer: 3
-    },
-    {
-      question: "2. El suero glucosado (Dextrosa al 20%) es una solución de glucosa monohidratada, que se aplica para aportar calorías. La osmolaridad que presenta esta solución es de:",
-      options: ["a) 252 mosm/L", "b) 554 mosm/L", "c) 55 mosm/L", "d) 1108 mosm/L"],
-      answer: 3
-    },
-    {
-      question: "3. La hipercalemia es la urgencia electrolítica más frecuente y grave que se encuentra en la práctica clínica. Una de las causas de hipercalemia es:",
-      options: ["a) Insuficiencia renal", "b) Alcalosis", "c) Diarrea", "d) Pérdidas gastrointestinales"],
-      answer: 0
-    },
-    {
-      question: "4. Esta solución es la primera elección para el estado de shock, debido a que su componente presenta un efecto buffer transformándolo en bicarbonato gracias al ciclo de Cori:",
-      options: ["a) Lactato de Ringer", "b) Bicarbonato de sodio", "c) Ringer", "d) Dextrosa al 5%"],
-      answer: 0
-    },
-    {
-      question: "5. De las siguientes soluciones electrolíticas, ¿cuál aplicaría a un paciente que ha presentado 10 episodios de diarrea durante 24 horas aproximadamente?",
-      options: ["a) Solución salina isotónica (S.S.I.)", "b) Solución de Hartmann", "c) Dextrosa 5%", "d) Bicarbonato 5%"],
-      answer: 1
-    },
-    {
-      question: "6. Si usted desea hacer una redistribución rápida de líquidos desde el espacio intersticial e intravascular al vascular, requiere una solución de:",
-      options: ["a) Dextrosa al 5%", "b) Solución salina isotónica (S.S.I.) al 0.9%", "c) Solución salina hipertónica (S.S.I.) al 3.5%", "d) Ringer"],
-      answer: 2
-    },
-    {
-      question: "7. (Repetida) Si usted desea hacer una redistribución rápida de líquidos desde el espacio intersticial e intravascular al vascular, requiere una solución de:",
-      options: ["a) Dextrosa al 5%", "b) Solución salina isotónica (S.S.I.) al 0.9%", "c) Solución salina hipertónica (S.S.I.) al 3.5%", "d) Ringer"],
-      answer: 2
-    },
-    {
-      question: "8. Al servicio de urgencias llega una paciente de 35 años con vómitos y deposiciones semilíquidas. Ionograma: Na 140 mEq/L, Cl 98 mEq/L, K 7.6 mEq/L, Ca 9.2 mg/dl, Mg 1.2 mEq/L. ¿Qué indica?",
-      options: ["a) Hipercalcemia e hiperpotasemia", "b) Hipercloremia e hipomagnesemia", "c) Normonatremia e hiperpotasemia", "d) Hipocloremia e hipopotasemia"],
-      answer: 2
-    },
-    {
-      question: "9. ¿Qué indica que una solución de 250 ml se encuentra al 2.5%?",
-      options: ["a) Que hay 2.5 g en la solución.", "b) Que hay 3.75 g en cada 100 cc de solución.", "c) Que le apliqué 6.25 g a los 250 ml de solución.", "d) Que hay 6.25 g en 250 ml de solución."],
-      answer: 3
-    },
-    {
-      question: "10. La solución de bicarbonato de sodio se aplica a una concentración de 7.5%. El aporte de mEq de Na⁺ y HCO₃⁻ en 500 cc es de:",
-      options: ["a) 8.9 mEq", "b) 445 mEq", "c) 890 mEq", "d) 101 mEq"],
-      answer: 1
-    },
-    {
-      question: "11. La solución de bicarbonato de sodio al 7.5% se aplica en casos de:",
-      options: ["a) Acidosis respiratoria", "b) Alcalosis metabólica", "c) Paro cardíaco", "d) Hipocalcemia"],
-      answer: 2
-    },
-    {
-      question: "12. (Repetida) La hipercalemia es la urgencia electrolítica más frecuente. Una de sus causas es:",
-      options: ["a) Insuficiencia renal", "b) Alcalosis", "c) Diarrea", "d) Pérdidas gastrointestinales"],
-      answer: 0
-    },
-    {
-      question: "13. Electrolito esencial para la función cardíaca y celular que disminuye el riesgo de hipokalemia en pacientes con diuréticos y corticoides:",
-      options: ["a) Fosfato de potasio", "b) Hartman", "c) Dextrosa 5%", "d) Suero oral"],
-      answer: 0
-    },
-    {
-      question: "14. (Repetida) Si desea redistribuir líquidos rápidamente al compartimento vascular, requiere una solución de:",
-      options: ["a) Dextrosa al 5%", "b) Solución salina isotónica (S.S.I.) al 0.9%", "c) Solución salina hipertónica (S.S.I.) al 3.5%", "d) Ringer"],
-      answer: 2
-    },
-    {
-      question: "15. Uno de estos iones es considerado el principal catión intracelular:",
-      options: ["a) Potasio (K)", "b) Magnesio (Mg)", "c) Sodio (Na)", "d) Fosfato inorgánico (HPO₄²⁻)"],
-      answer: 0
-    },
-    {
-      question: "16. El agua producida por la combustión u oxidación de los alimentos se denomina:",
-      options: ["a) Agua desionizada", "b) Agua regia", "c) Agua metabólica", "d) Agua destilada"],
-      answer: 2
-    },
-    {
-      question: "17. La solución isotónica de Ringer contiene:",
-      options: ["a) Cloruro de sodio", "b) Bicarbonato", "c) D-Glucosa", "d) Cloruros de sodio, potasio y calcio"],
-      answer: 3
-    },
-    {
-      question: "18. Considerando la concentración de miliequivalentes por litro, una solución es hipertónica cuando:",
-      options: ["a) El contenido total de electrolitos es inferior a 250 mEq/L", "b) El contenido total de electrolitos es superior a 375 mEq/L", "c) El contenido total de electrolitos es aproximadamente 310 mEq/L", "d) Ninguna de las anteriores"],
-      answer: 1
-    },
-    {
-      question: "19. El agua, por sus propiedades físico-químicas, permite almacenar más calor sin elevar su temperatura. ¿A qué propiedad se debe?",
-      options: ["a) Calor de evaporación", "b) Calor específico", "c) Calor de fusión", "d) Densidad"],
-      answer: 1
+    // Renderiza el panel superior con indicadores de pregunta.
+    function renderTopPanel() {
+      const topPanel = document.getElementById('topPanel');
+      topPanel.innerHTML = "";
+      questions.forEach((q, index) => {
+        const indicator = document.createElement('div');
+        indicator.className = "question-indicator";
+        indicator.textContent = index + 1;
+        if (submitted[index]) {
+          indicator.classList.add(userAnswers[index] === questions[index].answer ? "correct" : "wrong");
+        }
+        topPanel.appendChild(indicator);
+      });
     }
-  ];
 
-  let currentQuestion = 0;
-  const userAnswers = new Array(questions.length).fill(null);
+    // Renderiza la pregunta actual y sus opciones.
+    function renderQuestion() {
+      const container = document.getElementById('questionContainer');
+      container.innerHTML = "";
+      const qObj = questions[currentQuestion];
 
-  // Renderiza el panel superior de indicadores de pregunta.
-  function renderTopPanel() {
-    const topPanel = document.getElementById('topPanel');
-    topPanel.innerHTML = "";
-    questions.forEach((q, index) => {
-      const indicator = document.createElement('div');
-      indicator.className = "question-indicator";
-      indicator.textContent = index + 1;
-      if (userAnswers[index] !== null) {
-        if (userAnswers[index] === questions[index].answer) {
-          indicator.classList.add("correct");
+      const qTitle = document.createElement('h2');
+      qTitle.textContent = qObj.question;
+      container.appendChild(qTitle);
+
+      const ul = document.createElement('ul');
+      ul.className = "options";
+      qObj.options.forEach((option, idx) => {
+        const li = document.createElement('li');
+        const label = document.createElement('label');
+        const radio = document.createElement('input');
+        radio.type = "radio";
+        radio.name = "option";
+        radio.value = idx;
+        radio.disabled = submitted[currentQuestion];  // Si ya se envió, deshabilitar
+        if (userAnswers[currentQuestion] === idx) {
+          radio.checked = true;
+        }
+        radio.addEventListener('change', () => {
+          userAnswers[currentQuestion] = idx;
+        });
+        label.appendChild(radio);
+        label.appendChild(document.createTextNode(" " + option));
+        li.appendChild(label);
+        ul.appendChild(li);
+      });
+      container.appendChild(ul);
+
+      // Mostrar retroalimentación si ya se envió la respuesta
+      const feedback = document.createElement('div');
+      feedback.id = "feedback";
+      feedback.className = "feedback";
+      if (submitted[currentQuestion]) {
+        if (userAnswers[currentQuestion] === questions[currentQuestion].answer) {
+          feedback.textContent = "¡Correcto!";
+          feedback.style.color = "green";
         } else {
-          indicator.classList.add("wrong");
+          feedback.textContent = "Incorrecto";
+          feedback.style.color = "red";
         }
       }
-      topPanel.appendChild(indicator);
-    });
-  }
+      container.appendChild(feedback);
+    }
 
-  // Renderiza la pregunta actual y sus opciones.
-  function renderQuestion() {
-    const container = document.getElementById('questionContainer');
-    container.innerHTML = "";
-    const qObj = questions[currentQuestion];
+    // Función para enviar la respuesta y obtener la corrección.
+    function submitAnswer() {
+      if (userAnswers[currentQuestion] === null) {
+        alert("Por favor, selecciona una opción.");
+        return;
+      }
+      if (submitted[currentQuestion]) {
+        alert("Ya enviaste tu respuesta para esta pregunta.");
+        return;
+      }
+      submitted[currentQuestion] = true;
+      renderTopPanel();
+      renderQuestion();
+    }
 
-    const qTitle = document.createElement('h2');
-    qTitle.textContent = qObj.question;
-    container.appendChild(qTitle);
+    function prevQuestion() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestion();
+      }
+    }
 
-    const ul = document.createElement('ul');
-    ul.className = "options";
-    qObj.options.forEach((option, idx) => {
-      const li = document.createElement('li');
-      const label = document.createElement('label');
-      const radio = document.createElement('input');
-      radio.type = "radio";
-      radio.name = "option";
-      radio.value = idx;
-      radio.checked = userAnswers[currentQuestion] === idx;
-      radio.addEventListener('change', () => {
-        userAnswers[currentQuestion] = idx;
-        showFeedback();
-        renderTopPanel();
+    function nextQuestion() {
+      if (!submitted[currentQuestion]) {
+        alert("Debes enviar tu respuesta antes de continuar.");
+        return;
+      }
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      let correctCount = 0;
+      submitted.forEach((sub, idx) => {
+        if (sub && userAnswers[idx] === questions[idx].answer) correctCount++;
       });
-      label.appendChild(radio);
-      label.appendChild(document.createTextNode(" " + option));
-      li.appendChild(label);
-      ul.appendChild(li);
-    });
-    container.appendChild(ul);
-
-    // Área para mostrar retroalimentación inmediata
-    const feedback = document.createElement('div');
-    feedback.id = "feedback";
-    feedback.className = "feedback";
-    container.appendChild(feedback);
-    showFeedback();
-  }
-
-  // Muestra la retroalimentación en función de la respuesta seleccionada.
-  function showFeedback() {
-    const feedback = document.getElementById('feedback');
-    if (userAnswers[currentQuestion] === null) {
-      feedback.textContent = "";
-      return;
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = `Tu calificación: ${correctCount} de ${questions.length}`;
     }
-    if (userAnswers[currentQuestion] === questions[currentQuestion].answer) {
-      feedback.textContent = "Correcto";
-      feedback.style.color = "green";
-    } else {
-      feedback.textContent = "Incorrecto";
-      feedback.style.color = "red";
-    }
-  }
 
-  // Funciones para la navegación entre preguntas.
-  function prevQuestion() {
-    if (currentQuestion > 0) {
-      currentQuestion--;
-      renderQuestion();
-    }
-  }
-
-  function nextQuestion() {
-    if (currentQuestion < questions.length - 1) {
-      currentQuestion++;
-      renderQuestion();
-    } else {
-      showResult();
-    }
-  }
-
-  // Calcula y muestra la calificación final.
-  function showResult() {
-    let correctCount = 0;
-    userAnswers.forEach((ans, idx) => {
-      if (ans === questions[idx].answer) correctCount++;
-    });
-    const resultDiv = document.getElementById('result');
-    resultDiv.textContent = `Tu calificación: ${correctCount} de ${questions.length}`;
-  }
-
-  // Render inicial
-  renderTopPanel();
-  renderQuestion();
-</script>
-
+    // Render inicial
+    renderTopPanel();
+    renderQuestion();
+  </script>
 </body>
 </html>
